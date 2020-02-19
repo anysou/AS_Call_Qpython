@@ -42,6 +42,13 @@
             android:onClick="onQPyExec"
             android:text="Run"
             android:layout_gravity="center_horizontal" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="checkphone"
+            android:text="是真机还是模拟器" />
     </LinearLayout>
 
 

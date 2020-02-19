@@ -1,14 +1,18 @@
 package com.example.as_call_qpython;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -42,7 +46,14 @@ public class MainActivity extends AppCompatActivity {
                 "    droid.makeToast(s)\n" +
                 "except:\n" +
                 "    print(\"Hello, Please update to newest QPython version from (http://play.qpython.com/qrcode-python.html) to use this feature\")\n");
+
+
+
     }
+
+
+
+
 
     @Override  //菜单
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -139,4 +150,44 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    //判断是否为模拟器
+    public boolean isEmulator() {
+        /*
+        <!-- 添加拨号权限,但安卓6.0以后该句无效果了。采用了动态权限控制-->
+        <uses-permission android:name="android.permission.CALL_PHONE"/>
+         */
+        //动态的请求权限
+        ActivityCompat.requestPermissions(this, new String[]{
+                Manifest.permission.CALL_PHONE
+        }, 0x11); //0x11是请求码，可以在回调中获取
+        String url = "tel:" + "123456";
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse(url));
+        //startActivity(intent);
+        // 是否可以处理跳转到拨号的 Intent
+        boolean isPhone = intent.resolveActivity(this.getPackageManager()) != null;
+        return Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.toLowerCase().contains("vbox")
+                || Build.FINGERPRINT.toLowerCase().contains("test-keys")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("MuMu")
+                || Build.MODEL.contains("virtual")
+                || Build.SERIAL.equalsIgnoreCase("android")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
+                || "google_sdk".equals(Build.PRODUCT)
+                || ((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE))
+                .getNetworkOperatorName().toLowerCase().equals("android")
+                || !isPhone;
+    }
+
+    public void checkphone(View view) {
+        if (isEmulator())
+            Toast.makeText(this,"是模拟器",Toast.LENGTH_LONG).show();
+        else
+            Toast.makeText(this,"是手机",Toast.LENGTH_LONG).show();
+    }
 }
